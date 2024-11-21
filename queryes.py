@@ -1,7 +1,7 @@
 import django
 import datetime
 import os
-from django.db.models import Count
+from django.db.models import Count, Value
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'project.settings')
 django.setup()
@@ -225,7 +225,6 @@ if __name__ == "__main__":
         )
     ).values('id', 'rating', 'is_popular')
     print(entries)
-    , Value
 
     entries = Entry.objects.annotate(
         count_tags=Count("tags"),
