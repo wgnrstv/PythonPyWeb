@@ -1,5 +1,7 @@
 import django
+import datetime
 import os
+from django.db.models import Count
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'project.settings')
 django.setup()
@@ -21,14 +23,12 @@ if __name__ == "__main__":
     entries = Entry.objects.filter(blog__in=inner_qs)
     print(entries)
     print(Entry.objects.filter(number_of_comments__gt=10))
-    import datetime
 
     print(Entry.objects.filter(pub_date__gte=datetime.date(2023, 6, 1)))
     print(Entry.objects.filter(number_of_comments__gt=10).filter(rating__lt=4))
     print(Entry.objects.filter(headline__lte="Зя"))
     print(Entry.objects.filter(headline__startswith='Как'))
     print(Entry.objects.filter(headline__endswith='ния'))
-    import datetime
 
     start_date = datetime.date(2023, 1, 1)
     end_date = datetime.date(2023, 12, 31)
@@ -39,7 +39,6 @@ if __name__ == "__main__":
     print(Entry.objects.filter(pub_date__year=2023).filter(pub_date__day__gte=1).filter(
         pub_date__day__lte=15).values_list("author__name").distinct())
     print(Entry.objects.filter(pub_date__week_day=2).values('blog__name', 'pub_date', 'headline'))
-    import datetime
 
     print(Entry.objects.filter(pub_date__date=datetime.date(2021, 6, 1)))
     print(Entry.objects.filter(pub_date__date__gt=datetime.date(2024, 1, 1)))
@@ -82,11 +81,11 @@ if __name__ == "__main__":
     print(filtered_data.order_by("id"))
     print(filtered_data.order_by("-id"))
     print(filtered_data.order_by("-name", "id"))
-    from django.db.models import Count
+    
 
     entry = Blog.objects.annotate(number_of_entries=Count('entries')).values('name', 'number_of_entries')
     print(entry)
-    from django.db.models import Count
+    
 
     blogs = Blog.objects.alias(number_of_entries=Count('entries')).filter(number_of_entries__gt=4)
     print(blogs)
@@ -103,7 +102,7 @@ if __name__ == "__main__":
     average_rating = Entry.objects.aggregate(
         average_rating3=Avg('rating', filter=Q(pub_date__year__gt=2023)))
     print(average_rating)
-    from django.db.models import Count
+    
 
     count_authors = Entry.objects.aggregate(
         count_authors=Count('author', distinct=True)
@@ -226,7 +225,7 @@ if __name__ == "__main__":
         )
     ).values('id', 'rating', 'is_popular')
     print(entries)
-    from django.db.models import Count, Value
+    , Value
 
     entries = Entry.objects.annotate(
         count_tags=Count("tags"),
