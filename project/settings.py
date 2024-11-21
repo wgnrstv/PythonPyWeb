@@ -12,26 +12,29 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-#x%01s7&6@_&duo#swv0u_#lp!&-t*g_-%cm6+$-$k0gze5a=!'
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG') == 'true'
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = [host.strip() for host in os.getenv('ALLOWED_HOSTS').split(',')]
 
 # Application definition
 
 INSTALLED_APPS = [
+    "debug_toolbar",
+    "django_filters",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -41,12 +44,14 @@ INSTALLED_APPS = [
     'apps.app',
     'apps.db_train',
     'apps.api',
+    'apps.db_train_alternative',
     'tinymce',
     'crispy_forms',
     "crispy_bootstrap4",
-    'apps.db_train_alternative',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'rest_framework_simplejwt',
 ]
-
 
 # Настройки TinyMCE
 TINYMCE_DEFAULT_CONFIG = {
@@ -69,6 +74,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
 ROOT_URLCONF = 'project.urls'
@@ -91,7 +97,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'project.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
@@ -101,7 +106,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     },
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -121,7 +125,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
@@ -134,12 +137,14 @@ USE_I18N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')  # Место для хранения (на сервере) статических файлов при выполнении collectstatic
+STATIC_URL = "static/"  # Папка в корне проекта, где будут собираться статические файлы
+if 'localhost' in ALLOWED_HOSTS:
+    STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]  # Папка для локального проекта
+else:
+    STATIC_ROOT = os.path.join(BASE_DIR, 'static')  # Папка для сервера
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Место для хранения (на сервере) медиафайлов
@@ -148,3 +153,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Место для хранени
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
